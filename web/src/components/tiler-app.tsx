@@ -19,7 +19,7 @@ const MAX_RESOLUTION = 4096;
 type OptionsState = Record<string, TilingOptionsRecord>;
 type PaletteState = Record<string, Record<string, string>>;
 
-const OVERSCAN_FACTOR = 1.12;
+const OVERSCAN_FACTOR = 1.3;
 
 const randomHexColor = () => {
   const value = Math.floor(Math.random() * 0xffffff);

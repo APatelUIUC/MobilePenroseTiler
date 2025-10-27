@@ -118,7 +118,7 @@ const ensurePositiveInteger = (value: number, fallback = 1): number =>
 const generateTriangleTiling = (options: TriangularOptions): TilingPolygon[] => {
   const { density, baseAngle, edgeRatio, diagonal, rotation } = options;
   const cells = ensurePositiveInteger(density);
-  const margin = 2;
+  const margin = Math.max(4, Math.ceil(cells * 0.2));
 
   const angleRad = baseAngle * RAD;
   const vectorA: Vector2 = { x: 1, y: 0 };
@@ -161,7 +161,7 @@ const generateParallelogramTiling = (
 ): TilingPolygon[] => {
   const { density, angle, edgeRatio, rotation } = options;
   const cells = ensurePositiveInteger(density);
-  const margin = 2;
+  const margin = Math.max(4, Math.ceil(cells * 0.2));
   const angleRad = angle * RAD;
   const vectorA: Vector2 = { x: 1, y: 0 };
   const vectorB: Vector2 = {
@@ -230,7 +230,7 @@ const generateHexagon = (
 const generateHexTiling = (options: HexOptions): TilingPolygon[] => {
   const { rings, orientation, parity } = options;
   const radius = ensurePositiveInteger(rings);
-  const margin = 1;
+  const margin = Math.max(2, Math.ceil(radius * 0.3));
   const extent = radius + margin;
   const polygons: TilingPolygon[] = [];
 
@@ -333,7 +333,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     },
     scaleMultiplier: (options) => {
       const penroseOptions = options as unknown as PenroseOptions;
-      return penroseOptions.zoom === "in" ? 1 : 0.5;
+      return penroseOptions.zoom === "in" ? 1.2 : 0.6;
     },
     outlineWidth: (scale, options) => {
       const penroseOptions = options as unknown as PenroseOptions;
@@ -414,6 +414,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
       const triangleOptions = options as unknown as TriangularOptions;
       return generateTriangleTiling(triangleOptions);
     },
+    scaleMultiplier: () => 1.15,
     outlineWidth: (scale) => Math.max(scale * 0.015, 0.4),
   },
   {
@@ -479,6 +480,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     ],
     generate: (options) =>
       generateParallelogramTiling(options as unknown as ParallelogramOptions),
+    scaleMultiplier: () => 1.15,
     outlineWidth: (scale) => Math.max(scale * 0.02, 0.5),
   },
   {
@@ -534,6 +536,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     ],
     generate: (options) =>
       generateHexTiling(options as unknown as HexOptions),
+    scaleMultiplier: () => 1.18,
     outlineWidth: (scale) => Math.max(scale * 0.02, 0.45),
   },
   {
