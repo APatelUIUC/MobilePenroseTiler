@@ -1,6 +1,6 @@
 ## Mobile Tiling Studio (web app)
 
-This directory contains the Next.js implementation of the tiling playground. The app offers Penrose, triangular, parallelogram, and hexagonal tilings with per-pattern controls, Tailwind styling, and TypeScript types throughout.
+This directory contains the Next.js implementation of the tiling playground. The app offers Penrose, Einstein hat, triangular, parallelogram, and hexagonal tilings with per-pattern controls, Tailwind styling, and TypeScript types throughout.
 
 ### Scripts
 
@@ -25,6 +25,7 @@ Any push to the configured branch will trigger a new Vercel build.
 ### Project notes
 
 - `src/lib/tilings.ts` centralises tiling definitions, controls, palette roles, projection, and canvas rendering.
+- `src/lib/einstein.ts` ports the official hat substitution system so the Einstein monotile renders accurately.
 - `src/lib/geometry.ts` houses reusable vector helpers used by each tiling generator.
 - `src/components/tiler-app.tsx` renders the full UI (tiling picker, per-pattern controls, palette editor, canvas preview).
 - You can extend the experience by adding new tiling definitions to `src/lib/tilings.ts` – the UI will automatically surface new controls based on the schema.

@@ -11,6 +11,10 @@ import {
   penroseOutlineFactor,
   PenrosePolygon,
 } from "./penrose";
+import {
+  EinsteinPolygon,
+  generateEinsteinPolygons,
+} from "./einstein";
 
 export interface TilingPolygon {
   role: string;
@@ -550,6 +554,91 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     generate: (options) =>
       generateHexTiling(options as unknown as HexOptions),
     outlineWidth: (scale) => Math.max(scale * 0.02, 0.45),
+  },
+  {
+    id: "einstein",
+    icon: "🧠",
+    name: "Einstein",
+    tagline: "The 2023 \"hat\" monotile with aperiodic substitution structure.",
+    options: {
+      defaults: {
+        iterations: 3,
+        root: "H",
+        supertiles: "none",
+      },
+      controls: [
+        {
+          type: "slider",
+          key: "iterations",
+          label: "Inflation steps",
+          min: 1,
+          max: 5,
+          step: 1,
+          description: "How many substitution inflations to apply to the hat tiling.",
+        },
+        {
+          type: "select",
+          key: "root",
+          label: "Base metatile",
+          options: [
+            { value: "H", label: "H metatile" },
+            { value: "T", label: "T metatile" },
+            { value: "P", label: "P metatile" },
+            { value: "F", label: "F metatile" },
+          ],
+          description: "Choose which metatile patch to render after substitution.",
+        },
+        {
+          type: "select",
+          key: "supertiles",
+          label: "Supertile shading",
+          options: [
+            { value: "none", label: "Hidden" },
+            { value: "outline", label: "Show guides" },
+          ],
+          description: "Toggle pastel guides for the hierarchical metatile boundaries.",
+        },
+      ],
+    },
+    colorRoles: [
+      { id: "hat-h", label: "H hats", default: "#4f46e5", category: "fill" },
+      { id: "hat-t", label: "T hats", default: "#ec4899", category: "fill" },
+      { id: "hat-p", label: "P hats", default: "#f59e0b", category: "fill" },
+      { id: "hat-f", label: "F hats", default: "#10b981", category: "fill" },
+      { id: "supertile-h", label: "H supertiles", default: "#dbeafe", category: "fill" },
+      { id: "supertile-t", label: "T supertiles", default: "#fce7f3", category: "fill" },
+      { id: "supertile-p", label: "P supertiles", default: "#fef3c7", category: "fill" },
+      { id: "supertile-f", label: "F supertiles", default: "#dcfce7", category: "fill" },
+      { id: "outline", label: "Shared outline", default: "#0f172a", category: "outline" },
+      {
+        id: "background",
+        label: "Background",
+        default: "#f8fafc",
+        category: "background",
+      },
+    ],
+    generate: (options) => {
+      const data = options as TilingOptionsRecord;
+      const iterationsRaw = Number(data.iterations ?? 3);
+      const level = Math.max(1, Math.round(iterationsRaw));
+      const expansions = Math.max(0, level - 1);
+      const rootRaw = typeof data.root === "string" ? data.root : "H";
+      const root = rootRaw === "T" || rootRaw === "P" || rootRaw === "F" ? rootRaw : "H";
+      const includeSupertiles = data.supertiles === "outline";
+
+      const einsteinPolys: EinsteinPolygon[] = generateEinsteinPolygons({
+        expansions,
+        level,
+        root,
+        includeSupertiles,
+      });
+
+      return einsteinPolys.map((poly) => ({
+        role: poly.role,
+        points: poly.points,
+      }));
+    },
+    outlineWidth: (scale) => Math.max(scale * 0.018, 0.5),
   },
 ];
 

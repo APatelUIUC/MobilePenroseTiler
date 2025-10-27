@@ -15,9 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mobile Tiling Studio",
   description:
-    "Design Penrose, triangular, parallelogram, and hexagonal tilings in the browser with responsive controls and instant PNG export.",
+    "Design Penrose, Einstein hat, triangular, parallelogram, and hexagonal tilings in the browser with responsive controls and instant PNG export.",
   keywords: [
     "Penrose",
+    "Einstein monotile",
+    "hat tile",
     "tiling",
     "triangular",
     "hexagonal",
@@ -30,14 +32,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Mobile Tiling Studio",
     description:
-      "Create Penrose, custom triangle, parallelogram, and honeycomb tilings directly in your browser and export high-resolution PNGs.",
+      "Create Penrose, Einstein hat, custom triangle, parallelogram, and honeycomb tilings directly in your browser and export high-resolution PNGs.",
     siteName: "Mobile Tiling Studio",
   },
   twitter: {
     card: "summary_large_image",
     title: "Mobile Tiling Studio",
     description:
-      "Generate customizable geometric tilings in seconds and download high-resolution PNGs.",
+      "Generate customizable Penrose, Einstein, and lattice tilings in seconds and download high-resolution PNGs.",
   },
 };
 
