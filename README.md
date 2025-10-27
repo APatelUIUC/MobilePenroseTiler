@@ -1,73 +1,60 @@
-# Penrose Tiling Generator
+# Mobile Penrose Tiler
 
-### Introduction
+Interactive Penrose tiling generator built with Next.js, designed to run smoothly on desktop and mobile and deploy quickly to Vercel. The original Python script from the OSS project is still available in `penrose.py` for reference.
 
-This is a highly customizable penrose tiling generator using python.
+## Features
 
-A penrose tiling is a tiling of shapes (in this code, a thin and a thick rhombus) that has five-fold roational symmetry, reflection symmetry, but not translational symmetry. What this means is that the pattern will never repeat, even if you continue it to infinity.
+- Real-time Penrose subdivision renderer with configurable layers (subdivisions)
+- Instant canvas preview that adapts to any screen size
+- Visual controls for colors, zoom level, and output resolution
+- High-resolution PNG export with a single click
+- Mobile-first layout with Tailwind CSS styling
 
-For more on penrose tilings, you may wish to consult the [wiki page](https://en.wikipedia.org/wiki/Penrose_tiling).
+## Project structure
 
-Examples are at the [bottom](#examples).
+```
+.
+├─ penrose.py           # Original CLI renderer for reference
+├─ examples/            # Legacy gallery assets from the Python project
+└─ web/                 # Next.js application (App Router + TypeScript)
+   ├─ src/components/   # React components (Penrose UI)
+   ├─ src/lib/          # Rendering + math utilities
+   └─ public/           # Static assets
+```
 
-### Usage
+All web development happens inside the `web` directory.
 
-When running the code, you will be prompted to enter 5 pieces of information:
-- Number of Tiling Layers/Subdivions 
-    - This code generates the tiling by subdiving triangles, which are in pairs to from the rhombi
-    - This gets intricate quickly, and depending on your computer, anything above 10 may not render so quickly
-    - Example: `7`
-- Zoom
-    - You can decide whether or not to zoom in
-    - When zoomed in, the entire rectangle is filled with the pattern
-    - If you want the whole decagon (currently only with transparent background), you can choose to not zoom in
-    - The only valid options are `in` and `out`
-- Image Resolution
-    - This code will output the tiling as a png file
-    - You can specify the resolution of the image
-    - The scale of the tiling will remain unaffected
-    - Example: `1080 1080`
-- Colors
-    - Here you can have fun and pick the colors you want the tiling to be in
-    - You can choose the color of the thin rhombi, the thick rhombi, and the outline
-    - Presets: `red`, `orange`, `yellow`, `green`, `blue`, `purple`, `grey`, `brown`, `black`, `white`
-    - Hex Color Codes are also supported - ex. `a48432`
-    - If you really want to have some fun (or are lazy like me), use `random`
-    - Example: `red c27320 random`
-- Output Filename
-    - This will determine the name of the file that will house your penrose tiling
-    - This file is a png and **must** end in `.png`
-    - Filepaths are in theory supported, though not thoroughly tested
-    - Example: `example.png`
+## Getting started
 
-### The Code
+```bash
+cd web
+npm install
+npm run dev
+```
 
-While the customizability and most of the rendering logistics were created by me, I had help with the mathematical portion of the code.
+Visit http://localhost:3000 to use the tiler locally. The preview updates in real time as you adjust settings.
 
-[Preshing.com](https://preshing.com/) has a great article [here](https://preshing.com/20110831/penrose-tiling-explained/) on how the theory behind this works, and some code that I based my own code off of. 
+## Deployment (Vercel)
 
-A basic rundown of the functionality of my code is:
-1. Prompt the user for the customization options,then parse them and raise errors if they are not correct
-2. Create the 10 large trinagles
-3. Loop to divide each triangle the specified number of times
-4. Color the triangles
-5. Outline the triangles to highlight the rhombi
+1. Create a new project in Vercel and select this repository.
+2. When prompted for the project settings:
+   - **Framework**: Next.js  
+   - **Root directory**: `web`  
+   - **Build command**: `npm run build`  
+   - **Output directory**: `.next`
+3. Vercel installs dependencies and deploys automatically. Subsequent pushes to the configured branch retrigger deployments.
 
-### Examples
+The build output is entirely static/SSR-friendly, so no additional configuration is required.
 
-#### 2 Tiling Layers
-![penrose2-1.png](examples/penrose2-1.png)&nbsp;&nbsp;![penrose2-2.png](examples/penrose2-2.png)&nbsp;![penrose2-3.png](examples/penrose2-3.png)
+## Running tests & linting
 
-#### 5 Tiling Layers
-![penrose5-1.png](examples/penrose5-1.png)
+```bash
+cd web
+npm run lint
+```
 
-#### 7 Tiling Layers
-![penrose7-1.png](examples/penrose7-1.png)
-![penrose7-2.png](examples/penrose7-2.png)
-![penrose7-3.png](examples/penrose7-3.png)
+## Notes
 
-#### 10 Tiling Layers
-![penrose10-1.png](examples/penrose10-1.png)
-
-#### 13 Tiling Layers (8k resolution)
-![penrose13-1.png](examples/penrose13-1.png)
+- For large subdivision counts (9–10) on lower-powered devices, expect rendering to take a second or two. The UI surfaces render time so you can tune settings before exporting.
+- PNG export uses the configured resolution, so you can generate high-DPI assets (up to 4096×4096 by default).
+- If you prefer the original CLI workflow, run `python3 penrose.py` and follow the prompts.
