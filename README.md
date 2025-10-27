@@ -1,12 +1,14 @@
-# Mobile Penrose Tiler
+# Mobile Tiling Studio
 
-Interactive Penrose tiling generator built with Next.js, designed to run smoothly on desktop and mobile and deploy quickly to Vercel. The original Python script from the OSS project is still available in `penrose.py` for reference.
+Interactive tiling playground built with Next.js, designed to run smoothly on desktop and mobile and deploy quickly to Vercel. The original Python script from the OSS project is still available in `penrose.py` for reference.
 
 ## Features
 
-- Real-time Penrose subdivision renderer with configurable layers (subdivisions)
+- Penrose, triangular, checkerboard, and hexagonal tilings with unique controls
+- Real-time subdivision and lattice rendering with smooth canvas scaling
 - Instant canvas preview that adapts to any screen size
-- Visual controls for colors, zoom level, and output resolution
+- Per-tiling parameter controls (e.g., rotation, density, zoom) that update live
+- Visual palette editor with randomizers and built-in outline/background roles
 - High-resolution PNG export with a single click
 - Mobile-first layout with Tailwind CSS styling
 
@@ -17,8 +19,8 @@ Interactive Penrose tiling generator built with Next.js, designed to run smoothl
 ├─ penrose.py           # Original CLI renderer for reference
 ├─ examples/            # Legacy gallery assets from the Python project
 └─ web/                 # Next.js application (App Router + TypeScript)
-   ├─ src/components/   # React components (Penrose UI)
-   ├─ src/lib/          # Rendering + math utilities
+   ├─ src/components/   # React components (tiling UI & controls)
+   ├─ src/lib/          # Tiling math, geometry helpers, and renderer
    └─ public/           # Static assets
 ```
 
@@ -55,6 +57,7 @@ npm run lint
 
 ## Notes
 
-- For large subdivision counts (9–10) on lower-powered devices, expect rendering to take a second or two. The UI surfaces render time so you can tune settings before exporting.
+- Penrose subdivisions beyond 9–10 may take longer on low-powered devices; the render time indicator lets you tune settings before exporting.
 - PNG export uses the configured resolution, so you can generate high-DPI assets (up to 4096×4096 by default).
+- Triangular, square, and hex tilings include density and orientation controls so you can chase patterns like isohedral diamonds or honeycomb alternation.
 - If you prefer the original CLI workflow, run `python3 penrose.py` and follow the prompts.

@@ -1,6 +1,6 @@
-## Mobile Penrose Tiler (web app)
+## Mobile Tiling Studio (web app)
 
-This directory contains the Next.js implementation of the Penrose tiler UI. The app uses the App Router, Tailwind CSS, and TypeScript.
+This directory contains the Next.js implementation of the tiling playground. The app offers Penrose, triangular, checkerboard, and hexagonal tilings with per-pattern controls, Tailwind styling, and TypeScript types throughout.
 
 ### Scripts
 
@@ -24,6 +24,7 @@ Any push to the configured branch will trigger a new Vercel build.
 
 ### Project notes
 
-- All Penrose math and rendering utilities live in `src/lib/penrose.ts`.
-- UI components, including the interactive canvas, live in `src/components/`.
-- The renderer operates entirely client-side and exports a PNG via the browser `canvas` API. No serverless functions are required.
+- `src/lib/tilings.ts` centralises tiling definitions, controls, palette roles, projection, and canvas rendering.
+- `src/lib/geometry.ts` houses reusable vector helpers used by each tiling generator.
+- `src/components/tiler-app.tsx` renders the full UI (tiling picker, per-pattern controls, palette editor, canvas preview).
+- You can extend the experience by adding new tiling definitions to `src/lib/tilings.ts` – the UI will automatically surface new controls based on the schema.

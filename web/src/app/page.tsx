@@ -1,4 +1,4 @@
-import PenroseApp from "@/components/penrose-app";
+import TilerApp from "@/components/tiler-app";
 
 export default function Home() {
   return (
@@ -6,21 +6,21 @@ export default function Home() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 pb-16 pt-20 sm:px-6 lg:px-10">
         <header className="space-y-6 text-center sm:text-left">
           <span className="inline-flex items-center rounded-full border border-slate-700/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-            Penrose tiler
+            Generative tilings
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Create infinite aperiodic patterns right in your browser.
+            Tile the plane with Penrose, triangles, squares, or hexagons.
           </h1>
           <p className="mx-auto max-w-3xl text-base leading-relaxed text-slate-300 sm:mx-0 sm:text-lg">
-            Adjust the subdivisions, zoom, palette, and resolution to generate a Penrose tiling that
-            looks great on desktop or mobile. Download a high-resolution PNG when you&apos;re ready
-            to share it or ship it to Vercel.
+            Pick a tiling family, tweak its structure, and remix colors on the fly. From aperiodic
+            Penrose patterns to classic honeycomb grids, every view exports as a crisp, high-res PNG
+            in seconds.
           </p>
         </header>
-        <PenroseApp />
+        <TilerApp />
         <footer className="text-xs text-slate-400">
-          Built with Next.js, Tailwind, and the golden ratio. Works offline once loaded and scales
-          to high-resolution exports.
+          Built with Next.js, Tailwind, and a growing library of tilings. Works great on mobile and
+          desktop, with offline support after the first load.
         </footer>
       </div>
     </main>

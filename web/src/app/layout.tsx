@@ -13,22 +13,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mobile Penrose Tiler",
+  title: "Mobile Tiling Studio",
   description:
-    "Generate customizable Penrose tilings in the browser with mobile-friendly controls and instant PNG export.",
-  keywords: ["Penrose", "tiling", "aperiodic", "Next.js", "generator", "vercel"],
-  authors: [{ name: "Mobile Penrose Tiler" }],
+    "Design Penrose, triangular, square, and hexagonal tilings in the browser with responsive controls and instant PNG export.",
+  keywords: [
+    "Penrose",
+    "tiling",
+    "triangular",
+    "hexagonal",
+    "Next.js",
+    "generator",
+    "vercel",
+  ],
+  authors: [{ name: "Mobile Tiling Studio" }],
   openGraph: {
-    title: "Mobile Penrose Tiler",
+    title: "Mobile Tiling Studio",
     description:
-      "Create infinite, non-repeating Penrose tilings directly in your browser and export them as high-resolution PNGs.",
-    siteName: "Mobile Penrose Tiler",
+      "Create Penrose, checkerboard, triangular, and honeycomb tilings directly in your browser and export high-resolution PNGs.",
+    siteName: "Mobile Tiling Studio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mobile Penrose Tiler",
+    title: "Mobile Tiling Studio",
     description:
-      "Generate customizable Penrose tilings in seconds and download high-resolution PNGs.",
+      "Generate customizable geometric tilings in seconds and download high-resolution PNGs.",
   },
 };
 
