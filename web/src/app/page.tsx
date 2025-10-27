@@ -9,12 +9,12 @@ export default function Home() {
             Generative tilings
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Tile the plane with Penrose, triangles, squares, or hexagons.
+            Tile the plane with Penrose, triangles, parallelograms, or hexagons.
           </h1>
           <p className="mx-auto max-w-3xl text-base leading-relaxed text-slate-300 sm:mx-0 sm:text-lg">
             Pick a tiling family, tweak its structure, and remix colors on the fly. From aperiodic
-            Penrose patterns to classic honeycomb grids, every view exports as a crisp, high-res PNG
-            in seconds.
+            Penrose patterns to skewed triangle meshes and honeycomb grids, every view exports as a
+            crisp, high-res PNG in seconds.
           </p>
         </header>
         <TilerApp />

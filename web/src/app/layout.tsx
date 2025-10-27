@@ -15,12 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mobile Tiling Studio",
   description:
-    "Design Penrose, triangular, square, and hexagonal tilings in the browser with responsive controls and instant PNG export.",
+    "Design Penrose, triangular, parallelogram, and hexagonal tilings in the browser with responsive controls and instant PNG export.",
   keywords: [
     "Penrose",
     "tiling",
     "triangular",
     "hexagonal",
+    "parallelogram",
     "Next.js",
     "generator",
     "vercel",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Mobile Tiling Studio",
     description:
-      "Create Penrose, checkerboard, triangular, and honeycomb tilings directly in your browser and export high-resolution PNGs.",
+      "Create Penrose, custom triangle, parallelogram, and honeycomb tilings directly in your browser and export high-resolution PNGs.",
     siteName: "Mobile Tiling Studio",
   },
   twitter: {

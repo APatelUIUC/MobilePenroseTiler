@@ -4,7 +4,7 @@ Interactive tiling playground built with Next.js, designed to run smoothly on de
 
 ## Features
 
-- Penrose, triangular, checkerboard, and hexagonal tilings with unique controls
+- Penrose, triangular, parallelogram, and hexagonal tilings with unique controls
 - Real-time subdivision and lattice rendering with smooth canvas scaling
 - Instant canvas preview that adapts to any screen size
 - Per-tiling parameter controls (e.g., rotation, density, zoom) that update live
@@ -59,5 +59,5 @@ npm run lint
 
 - Penrose subdivisions beyond 9–10 may take longer on low-powered devices; the render time indicator lets you tune settings before exporting.
 - PNG export uses the configured resolution, so you can generate high-DPI assets (up to 4096×4096 by default).
-- Triangular, square, and hex tilings include density and orientation controls so you can chase patterns like isohedral diamonds or honeycomb alternation.
+- Triangular, parallelogram, and hex tilings include density, angle, and orientation controls so you can chase patterns like isohedral diamonds or honeycomb alternation.
 - If you prefer the original CLI workflow, run `python3 penrose.py` and follow the prompts.

@@ -1,4 +1,11 @@
-import { Vector2, centerPolygons, computeBounds, rotate } from "./geometry";
+import {
+  Vector2,
+  add,
+  centerPolygons,
+  computeBounds,
+  rotate,
+  scale,
+} from "./geometry";
 import {
   generatePenrosePolygons,
   penroseOutlineFactor,
@@ -99,79 +106,88 @@ const applyTransform = (
     points: polygon.points.map(transform),
   }));
 
-const projectSquareToTriangle = (size: number): TilingPolygon[] => {
-  const sqrtThreeOverTwo = Math.sqrt(3) / 2;
-  const polygons: TilingPolygon[] = [];
+const RAD = Math.PI / 180;
 
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const p0 = { x, y };
-      const p1 = { x: x + 1, y };
-      const p2 = { x, y: y + 1 };
-      const p3 = { x: x + 1, y: y + 1 };
-
-      polygons.push({
-        role: "up",
-        points: [p0, p1, p2],
-      });
-      polygons.push({
-        role: "down",
-        points: [p1, p3, p2],
-      });
-    }
-  }
-
-  const sheared = applyTransform(polygons, (point) => ({
-    x: point.x + 0.5 * point.y,
-    y: point.y * sqrtThreeOverTwo,
-  }));
-
-  return sheared;
-};
+const ensurePositiveInteger = (value: number, fallback = 1): number =>
+  Math.max(fallback, Math.round(value));
 
 const generateTriangleTiling = (options: TriangularOptions): TilingPolygon[] => {
-  const { density, rotation } = options;
-  const polygons = projectSquareToTriangle(density);
+  const { density, baseAngle, edgeRatio, diagonal, rotation } = options;
+  const cells = ensurePositiveInteger(density);
 
-  const centered = recenter(polygons);
-  const rotated =
-    rotation === 0
-      ? centered
-      : applyTransform(centered, (point) =>
-          rotate(point, (rotation * Math.PI) / 180),
-        );
+  const angleRad = baseAngle * RAD;
+  const vectorA: Vector2 = { x: 1, y: 0 };
+  const vectorB: Vector2 = {
+    x: edgeRatio * Math.cos(angleRad),
+    y: edgeRatio * Math.sin(angleRad),
+  };
 
-  return rotated;
-};
-
-const generateSquareTiling = (options: SquareOptions): TilingPolygon[] => {
-  const { density, rotation } = options;
   const polygons: TilingPolygon[] = [];
 
-  for (let y = 0; y < density; y += 1) {
-    for (let x = 0; x < density; x += 1) {
-      const role = (x + y) % 2 === 0 ? "primary" : "secondary";
+  for (let j = 0; j < cells; j += 1) {
+    for (let i = 0; i < cells; i += 1) {
+      const origin = add(scale(vectorA, i), scale(vectorB, j));
+      const p0 = origin;
+      const p1 = add(origin, vectorA);
+      const p2 = add(origin, vectorB);
+      const p3 = add(p1, vectorB);
+
+      if (diagonal === "backward") {
+        polygons.push({ role: "up", points: [p0, p2, p3] });
+        polygons.push({ role: "down", points: [p0, p1, p2] });
+      } else {
+        polygons.push({ role: "up", points: [p0, p1, p3] });
+        polygons.push({ role: "down", points: [p0, p3, p2] });
+      }
+    }
+  }
+
+  const centered = recenter(polygons);
+  if (rotation === 0) {
+    return centered;
+  }
+
+  const rotationRad = rotation * RAD;
+  return applyTransform(centered, (point) => rotate(point, rotationRad));
+};
+
+const generateParallelogramTiling = (
+  options: ParallelogramOptions,
+): TilingPolygon[] => {
+  const { density, angle, edgeRatio, rotation } = options;
+  const cells = ensurePositiveInteger(density);
+  const angleRad = angle * RAD;
+  const vectorA: Vector2 = { x: 1, y: 0 };
+  const vectorB: Vector2 = {
+    x: edgeRatio * Math.cos(angleRad),
+    y: edgeRatio * Math.sin(angleRad),
+  };
+
+  const polygons: TilingPolygon[] = [];
+
+  for (let j = 0; j < cells; j += 1) {
+    for (let i = 0; i < cells; i += 1) {
+      const origin = add(scale(vectorA, i), scale(vectorB, j));
+      const p0 = origin;
+      const p1 = add(origin, vectorA);
+      const p2 = add(p1, vectorB);
+      const p3 = add(origin, vectorB);
+      const role = (i + j) % 2 === 0 ? "primary" : "secondary";
+
       polygons.push({
         role,
-        points: [
-          { x, y },
-          { x: x + 1, y },
-          { x: x + 1, y: y + 1 },
-          { x, y: y + 1 },
-        ],
+        points: [p0, p1, p2, p3],
       });
     }
   }
 
   const centered = recenter(polygons);
-  const rotated =
-    rotation === 0
-      ? centered
-      : applyTransform(centered, (point) =>
-          rotate(point, (rotation * Math.PI) / 180),
-        );
+  if (rotation === 0) {
+    return centered;
+  }
 
-  return rotated;
+  const rotationRad = rotation * RAD;
+  return applyTransform(centered, (point) => rotate(point, rotationRad));
 };
 
 const hexToCartesianPointy = (q: number, r: number): Vector2 => {
@@ -235,13 +251,20 @@ export interface PenroseOptions {
   zoom: "in" | "out";
 }
 
+export type TriangleDiagonal = "forward" | "backward";
+
 export interface TriangularOptions {
   density: number;
+  baseAngle: number;
+  edgeRatio: number;
+  diagonal: TriangleDiagonal;
   rotation: number;
 }
 
-export interface SquareOptions {
+export interface ParallelogramOptions {
   density: number;
+  angle: number;
+  edgeRatio: number;
   rotation: number;
 }
 
@@ -321,10 +344,13 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     id: "triangular",
     icon: "🔺",
     name: "Triangular",
-    tagline: "Regular tessellation of equilateral triangles.",
+    tagline: "Custom triangle lattices with adjustable angles and diagonals.",
     options: {
       defaults: {
         density: 14,
+        baseAngle: 60,
+        edgeRatio: 1,
+        diagonal: "forward" as TriangleDiagonal,
         rotation: 0,
       },
       controls: [
@@ -339,12 +365,40 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
         },
         {
           type: "slider",
-          key: "rotation",
-          label: "Rotation",
-          min: 0,
-          max: 60,
+          key: "baseAngle",
+          label: "Base angle (°)",
+          min: 20,
+          max: 160,
           step: 1,
-          description: "Rotate the lattice in degrees.",
+          description: "Controls the angle between the lattice edges.",
+        },
+        {
+          type: "slider",
+          key: "edgeRatio",
+          label: "Edge ratio",
+          min: 0.4,
+          max: 2,
+          step: 0.05,
+          description: "Scales the second lattice edge relative to the first.",
+        },
+        {
+          type: "select",
+          key: "diagonal",
+          label: "Diagonal",
+          options: [
+            { value: "forward", label: "Forward slash" },
+            { value: "backward", label: "Back slash" },
+          ],
+          description: "Choose which diagonal divides each parallelogram.",
+        },
+        {
+          type: "slider",
+          key: "rotation",
+          label: "Rotation (°)",
+          min: 0,
+          max: 180,
+          step: 1,
+          description: "Rotate the entire tiling after generation.",
         },
       ],
     },
@@ -359,18 +413,22 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
         category: "background",
       },
     ],
-    generate: (options) =>
-      generateTriangleTiling(options as unknown as TriangularOptions),
+    generate: (options) => {
+      const triangleOptions = options as unknown as TriangularOptions;
+      return generateTriangleTiling(triangleOptions);
+    },
     outlineWidth: (scale) => Math.max(scale * 0.015, 0.4),
   },
   {
-    id: "square",
-    icon: "🟥",
-    name: "Checkerboard",
-    tagline: "Axis-aligned square tiling with alternating colors.",
+    id: "parallelogram",
+    icon: "🟪",
+    name: "Parallelogram",
+    tagline: "Alternating parallelograms with tunable skew and edge ratios.",
     options: {
       defaults: {
         density: 12,
+        angle: 90,
+        edgeRatio: 1,
         rotation: 0,
       },
       controls: [
@@ -381,24 +439,42 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
           min: 4,
           max: 40,
           step: 1,
-          description: "Number of squares along each axis.",
+          description: "Number of tiles along each axis.",
+        },
+        {
+          type: "slider",
+          key: "angle",
+          label: "Interior angle (°)",
+          min: 20,
+          max: 160,
+          step: 1,
+          description: "Angle between the two lattice directions.",
+        },
+        {
+          type: "slider",
+          key: "edgeRatio",
+          label: "Edge ratio",
+          min: 0.4,
+          max: 2,
+          step: 0.05,
+          description: "Length of the second edge relative to the first.",
         },
         {
           type: "slider",
           key: "rotation",
-          label: "Rotation",
+          label: "Rotation (°)",
           min: 0,
-          max: 45,
+          max: 180,
           step: 1,
-          description: "Tilt the tiling to create diamond patterns.",
+          description: "Rotate the tiling after construction.",
         },
       ],
     },
     colorRoles: [
-      { id: "primary", label: "Primary squares", default: "#10b981", category: "fill" },
+      { id: "primary", label: "Primary tiles", default: "#10b981", category: "fill" },
       {
         id: "secondary",
-        label: "Alternate squares",
+        label: "Alternate tiles",
         default: "#047857",
         category: "fill",
       },
@@ -411,7 +487,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
       },
     ],
     generate: (options) =>
-      generateSquareTiling(options as unknown as SquareOptions),
+      generateParallelogramTiling(options as unknown as ParallelogramOptions),
     outlineWidth: (scale) => Math.max(scale * 0.02, 0.5),
   },
   {

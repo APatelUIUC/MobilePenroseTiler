@@ -27,6 +27,21 @@ const randomHexColor = () => {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
+const toNumeric = (
+  value: TilingOptionValue,
+  fallback = 0,
+): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const formatNumericDisplay = (value: number): string =>
+  Number.isInteger(value) ? value.toString() : value.toFixed(2);
+
 const buildInitialOptions = (): OptionsState =>
   Object.fromEntries(
     TILINGS.map((tiling) => [
@@ -109,17 +124,20 @@ const TilingControlField = ({
   onInput: (next: TilingOptionValue) => void;
 }) => {
   if (control.type === "slider") {
+    const safeValue = toNumeric(value, control.min ?? 0);
+    const displayValue = formatNumericDisplay(safeValue);
+
     return (
       <div className="flex flex-col gap-3">
         <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
-          {control.label} ({value})
+          {control.label} ({displayValue})
         </label>
         <input
           type="range"
           min={control.min}
           max={control.max}
           step={control.step ?? 1}
-          value={value}
+          value={safeValue}
           onChange={(event) => onInput(Number(event.target.value))}
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-indigo-500 dark:bg-slate-700"
         />
@@ -129,7 +147,7 @@ const TilingControlField = ({
           min={control.min}
           max={control.max}
           step={control.step ?? 1}
-          value={value}
+          value={Number(safeValue.toFixed(4))}
           onChange={(event) => onInput(Number(event.target.value))}
           className="w-24 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         />
@@ -165,15 +183,20 @@ const TilingControlField = ({
       <label className="text-sm font-medium text-slate-700 dark:text-slate-200">
         {control.label}
       </label>
-      <input
-        type="number"
-        value={value}
-        min={control.min}
-        max={control.max}
-        step={control.step ?? 1}
-        onChange={(event) => onInput(Number(event.target.value))}
-        className="w-32 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-      />
+      {(() => {
+        const safeValue = toNumeric(value, control.min ?? 0);
+        return (
+          <input
+            type="number"
+            value={Number(safeValue.toFixed(4))}
+            min={control.min}
+            max={control.max}
+            step={control.step ?? 1}
+            onChange={(event) => onInput(Number(event.target.value))}
+            className="w-32 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          />
+        );
+      })()}
       <ControlDescription text={control.description} />
     </div>
   );
@@ -250,6 +273,12 @@ export const TilerApp = () => {
         }
         if (typeof control.max === "number") {
           numeric = Math.min(numeric, control.max);
+        }
+        const step = control.step ?? 1;
+        if (Number.isFinite(step) && step > 0 && !Number.isInteger(step)) {
+          const digits = step.toString().split(".")[1]?.length ?? 0;
+          const factor = 10 ** digits;
+          numeric = Math.round((numeric + Number.EPSILON) * factor) / factor;
         }
         nextValue = numeric;
       }

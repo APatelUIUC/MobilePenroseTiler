@@ -1,6 +1,6 @@
 ## Mobile Tiling Studio (web app)
 
-This directory contains the Next.js implementation of the tiling playground. The app offers Penrose, triangular, checkerboard, and hexagonal tilings with per-pattern controls, Tailwind styling, and TypeScript types throughout.
+This directory contains the Next.js implementation of the tiling playground. The app offers Penrose, triangular, parallelogram, and hexagonal tilings with per-pattern controls, Tailwind styling, and TypeScript types throughout.
 
 ### Scripts
 
