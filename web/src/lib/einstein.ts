@@ -452,44 +452,38 @@ const constructMetatiles = (patch: Geom): { H: Geom; T: Geom; P: Geom; F: Geom }
   return { H: newH, T: newT, P: newP, F: newF };
 };
 
-const ensureInteger = (value: number, fallback: number, minValue: number, maxValue: number) => {
-  if (!Number.isFinite(value)) return fallback;
-  const clamped = Math.max(minValue, Math.min(maxValue, Math.round(value)));
-  return clamped;
-};
-
 export interface EinsteinBuildOptions {
-  expansions: number;
-  root: "H" | "T" | "P" | "F";
-  level: number;
+  substitutions: number;
   includeSupertiles: boolean;
 }
 
-export const buildEinsteinPatch = (expansions: number) => {
+export const generateEinsteinPolygons = ({
+  substitutions,
+  includeSupertiles,
+}: EinsteinBuildOptions): EinsteinPolygon[] => {
+  const iterations = Math.max(1, Math.round(substitutions));
+
   let tiles = buildInitialMetatiles();
-  const iterations = ensureInteger(expansions, 0, 0, 6);
-  for (let i = 0; i < iterations; i += 1) {
-    const patch = constructPatch(tiles.H, tiles.T, tiles.P, tiles.F);
+  let patch = constructPatch(tiles.H, tiles.T, tiles.P, tiles.F);
+
+  for (let i = 1; i < iterations; i += 1) {
     tiles = constructMetatiles(patch);
+    patch = constructPatch(tiles.H, tiles.T, tiles.P, tiles.F);
   }
-  return tiles;
-};
 
-export const generateEinsteinPolygons = (options: EinsteinBuildOptions): EinsteinPolygon[] => {
-  const expansions = ensureInteger(options.expansions, 0, 0, 6);
-  const level = ensureInteger(options.level, 1, 1, 7);
-  const tiles = buildEinsteinPatch(expansions);
-  const root = tiles[options.root];
+  patch.recenter();
 
+  const depth = iterations + 1;
   const supertilePolygons: EinsteinPolygon[] = [];
-  if (options.includeSupertiles && level > 0) {
-    for (let depth = 0; depth < level; depth += 1) {
-      root.collectSupertiles(depth, IDENTITY, 0, supertilePolygons);
+
+  if (includeSupertiles) {
+    for (let d = 1; d <= iterations; d += 1) {
+      patch.collectSupertiles(d, IDENTITY, 0, supertilePolygons);
     }
   }
 
   const hatPolygons: EinsteinPolygon[] = [];
-  root.collect(level, IDENTITY, hatPolygons);
+  patch.collect(depth, IDENTITY, hatPolygons);
 
   return [...supertilePolygons, ...hatPolygons];
 };

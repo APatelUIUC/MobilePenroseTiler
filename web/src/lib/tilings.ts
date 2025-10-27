@@ -21,7 +21,7 @@ export interface TilingPolygon {
   points: Vector2[];
 }
 
-export type ColorRoleCategory = "fill" | "outline" | "background";
+export type ColorRoleCategory = "fill" | "outline";
 
 export interface ColorRole {
   id: string;
@@ -118,6 +118,7 @@ const ensurePositiveInteger = (value: number, fallback = 1): number =>
 const generateTriangleTiling = (options: TriangularOptions): TilingPolygon[] => {
   const { density, baseAngle, edgeRatio, diagonal, rotation } = options;
   const cells = ensurePositiveInteger(density);
+  const margin = 2;
 
   const angleRad = baseAngle * RAD;
   const vectorA: Vector2 = { x: 1, y: 0 };
@@ -128,8 +129,8 @@ const generateTriangleTiling = (options: TriangularOptions): TilingPolygon[] => 
 
   const polygons: TilingPolygon[] = [];
 
-  for (let j = 0; j < cells; j += 1) {
-    for (let i = 0; i < cells; i += 1) {
+  for (let j = -margin; j < cells + margin; j += 1) {
+    for (let i = -margin; i < cells + margin; i += 1) {
       const origin = add(scale(vectorA, i), scale(vectorB, j));
       const p0 = origin;
       const p1 = add(origin, vectorA);
@@ -160,6 +161,7 @@ const generateParallelogramTiling = (
 ): TilingPolygon[] => {
   const { density, angle, edgeRatio, rotation } = options;
   const cells = ensurePositiveInteger(density);
+  const margin = 2;
   const angleRad = angle * RAD;
   const vectorA: Vector2 = { x: 1, y: 0 };
   const vectorB: Vector2 = {
@@ -169,8 +171,8 @@ const generateParallelogramTiling = (
 
   const polygons: TilingPolygon[] = [];
 
-  for (let j = 0; j < cells; j += 1) {
-    for (let i = 0; i < cells; i += 1) {
+  for (let j = -margin; j < cells + margin; j += 1) {
+    for (let i = -margin; i < cells + margin; i += 1) {
       const origin = add(scale(vectorA, i), scale(vectorB, j));
       const p0 = origin;
       const p1 = add(origin, vectorA);
@@ -227,11 +229,14 @@ const generateHexagon = (
 
 const generateHexTiling = (options: HexOptions): TilingPolygon[] => {
   const { rings, orientation, parity } = options;
+  const radius = ensurePositiveInteger(rings);
+  const margin = 1;
+  const extent = radius + margin;
   const polygons: TilingPolygon[] = [];
 
-  for (let q = -rings; q <= rings; q += 1) {
-    const rMin = Math.max(-rings, -q - rings);
-    const rMax = Math.min(rings, -q + rings);
+  for (let q = -extent; q <= extent; q += 1) {
+    const rMin = Math.max(-extent, -q - extent);
+    const rMax = Math.min(extent, -q + extent);
     for (let r = rMin; r <= rMax; r += 1) {
       const center =
         orientation === "pointy"
@@ -319,12 +324,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
       { id: "thin", label: "Thin tiles", default: "#cc4c4c", category: "fill" },
       { id: "thick", label: "Thick tiles", default: "#3a70b8", category: "fill" },
       { id: "outline", label: "Outline", default: "#111827", category: "outline" },
-      {
-        id: "background",
-        label: "Background",
-        default: "#f8fafc",
-        category: "background",
-      },
     ],
     generate: (options) => {
       const penroseOptions = options as unknown as PenroseOptions;
@@ -410,12 +409,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
       { id: "up", label: "Up triangles", default: "#f97316", category: "fill" },
       { id: "down", label: "Down triangles", default: "#0ea5e9", category: "fill" },
       { id: "outline", label: "Outline", default: "#020617", category: "outline" },
-      {
-        id: "background",
-        label: "Background",
-        default: "#f8fafc",
-        category: "background",
-      },
     ],
     generate: (options) => {
       const triangleOptions = options as unknown as TriangularOptions;
@@ -483,12 +476,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
         category: "fill",
       },
       { id: "outline", label: "Outline", default: "#0f172a", category: "outline" },
-      {
-        id: "background",
-        label: "Background",
-        default: "#f8fafc",
-        category: "background",
-      },
     ],
     generate: (options) =>
       generateParallelogramTiling(options as unknown as ParallelogramOptions),
@@ -496,7 +483,7 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
   },
   {
     id: "hexagonal",
-    icon: "🔷",
+    icon: "⬢",
     name: "Hexagonal",
     tagline: "Honeycomb tessellation with optional alternate coloring.",
     options: {
@@ -544,12 +531,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
         category: "fill",
       },
       { id: "outline", label: "Outline", default: "#1e1b4b", category: "outline" },
-      {
-        id: "background",
-        label: "Background",
-        default: "#f8fafc",
-        category: "background",
-      },
     ],
     generate: (options) =>
       generateHexTiling(options as unknown as HexOptions),
@@ -563,7 +544,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
     options: {
       defaults: {
         iterations: 3,
-        root: "H",
         supertiles: "none",
       },
       controls: [
@@ -575,18 +555,6 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
           max: 5,
           step: 1,
           description: "How many substitution inflations to apply to the hat tiling.",
-        },
-        {
-          type: "select",
-          key: "root",
-          label: "Base metatile",
-          options: [
-            { value: "H", label: "H metatile" },
-            { value: "T", label: "T metatile" },
-            { value: "P", label: "P metatile" },
-            { value: "F", label: "F metatile" },
-          ],
-          description: "Choose which metatile patch to render after substitution.",
         },
         {
           type: "select",
@@ -610,26 +578,14 @@ export const TILINGS: ReadonlyArray<TilingDefinition> = [
       { id: "supertile-p", label: "P supertiles", default: "#fef3c7", category: "fill" },
       { id: "supertile-f", label: "F supertiles", default: "#dcfce7", category: "fill" },
       { id: "outline", label: "Shared outline", default: "#0f172a", category: "outline" },
-      {
-        id: "background",
-        label: "Background",
-        default: "#f8fafc",
-        category: "background",
-      },
     ],
     generate: (options) => {
       const data = options as TilingOptionsRecord;
-      const iterationsRaw = Number(data.iterations ?? 3);
-      const level = Math.max(1, Math.round(iterationsRaw));
-      const expansions = Math.max(0, level - 1);
-      const rootRaw = typeof data.root === "string" ? data.root : "H";
-      const root = rootRaw === "T" || rootRaw === "P" || rootRaw === "F" ? rootRaw : "H";
+      const iterations = Math.max(1, Math.round(Number(data.iterations ?? 3)));
       const includeSupertiles = data.supertiles === "outline";
 
       const einsteinPolys: EinsteinPolygon[] = generateEinsteinPolygons({
-        expansions,
-        level,
-        root,
+        substitutions: iterations,
         includeSupertiles,
       });
 
@@ -649,7 +605,7 @@ export const projectPolygons = (
   polygons: TilingPolygon[],
   width: number,
   height: number,
-  options?: { scaleMultiplier?: number; padding?: number },
+  options?: { scaleMultiplier?: number; padding?: number; overscan?: number },
 ): { polygons: TilingPolygon[]; scale: number } => {
   if (width <= 0 || height <= 0) {
     return { polygons: [], scale: 1 };
@@ -660,11 +616,12 @@ export const projectPolygons = (
   const worldWidth = bounds.maxX - bounds.minX || 1;
   const worldHeight = bounds.maxY - bounds.minY || 1;
 
-  const padding = options?.padding ?? 48;
+  const padding = options?.padding ?? 0;
   const innerWidth = Math.max(width - padding * 2, 1);
   const innerHeight = Math.max(height - padding * 2, 1);
   const baseScale = Math.min(innerWidth / worldWidth, innerHeight / worldHeight);
-  const scale = baseScale * (options?.scaleMultiplier ?? 1);
+  const overscan = options?.overscan ?? 1.08;
+  const scale = baseScale * (options?.scaleMultiplier ?? 1) * overscan;
 
   const centerX = (bounds.minX + bounds.maxX) / 2;
   const centerY = (bounds.minY + bounds.maxY) / 2;
@@ -690,7 +647,6 @@ export interface RenderConfig {
   palette: Record<string, string>;
   outlineColor: string;
   outlineWidth: number;
-  backgroundColor?: string;
 }
 
 export const renderToCanvas = ({
@@ -701,7 +657,6 @@ export const renderToCanvas = ({
   palette,
   outlineColor,
   outlineWidth,
-  backgroundColor,
 }: RenderConfig): void => {
   canvas.width = width;
   canvas.height = height;
@@ -713,13 +668,6 @@ export const renderToCanvas = ({
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.clearRect(0, 0, width, height);
   context.restore();
-
-  if (backgroundColor) {
-    context.save();
-    context.fillStyle = backgroundColor;
-    context.fillRect(0, 0, width, height);
-    context.restore();
-  }
 
   for (const polygon of polygons) {
     const fill = palette[polygon.role];

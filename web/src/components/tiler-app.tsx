@@ -19,6 +19,8 @@ const MAX_RESOLUTION = 4096;
 type OptionsState = Record<string, TilingOptionsRecord>;
 type PaletteState = Record<string, Record<string, string>>;
 
+const OVERSCAN_FACTOR = 1.12;
+
 const randomHexColor = () => {
   const value = Math.floor(Math.random() * 0xffffff);
   return `#${value.toString(16).padStart(6, "0")}`;
@@ -60,11 +62,6 @@ const buildInitialPalette = (): PaletteState =>
     ]),
   );
 
-const getBackgroundColor = (
-  palette: Record<string, string>,
-  roles: ColorRole[],
-) => palette[roles.find((role) => role.category === "background")?.id ?? ""];
-
 const getOutlineColor = (
   palette: Record<string, string>,
   roles: ColorRole[],
@@ -83,12 +80,12 @@ const renderTiling = (
   const generated = tiling.generate(options);
   const { polygons, scale } = projectPolygons(generated, width, height, {
     scaleMultiplier: tiling.scaleMultiplier?.(options),
+    overscan: OVERSCAN_FACTOR,
   });
 
   const outlineWidth =
     tiling.outlineWidth?.(scale, options) ?? fallbackOutlineWidth(scale);
 
-  const backgroundColor = getBackgroundColor(palette, tiling.colorRoles);
   const outlineColor =
     getOutlineColor(palette, tiling.colorRoles) ?? "#1e293b";
 
@@ -100,7 +97,6 @@ const renderTiling = (
     palette,
     outlineColor,
     outlineWidth,
-    backgroundColor,
   };
 
   renderToCanvas(config);
